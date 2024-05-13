@@ -1,0 +1,6 @@
+bin
+node_modules
+.env
+*_templ.go*
+tmp
+.git
