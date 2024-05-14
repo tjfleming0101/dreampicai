@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/tjfleming0101/dreampicai/pkg/sb"
 	"github.com/tjfleming0101/dreampicai/types"
 )
 
@@ -15,7 +16,20 @@ func WithUser(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 			return
 		}
-		user := types.AuthenticatedUser{}
+		accessToken, err := r.Cookie("at")
+		if err != nil {
+			next.ServeHTTP(w, r)
+			return
+		}		
+		resp, err := sb.Client.Auth.User(r.Context(), accessToken.Value)
+		if err != nil {
+			next.ServeHTTP(w, r)
+			return
+		}
+		user := types.AuthenticatedUser{
+			Email: resp.Email,
+			LoggedIn: true,
+		}		
 		ctx := context.WithValue(r.Context(), types.UserContextKey, user)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	}

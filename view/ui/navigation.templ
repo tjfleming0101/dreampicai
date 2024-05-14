@@ -58,13 +58,21 @@ templ Navigation() {
 							</a>
 						</li>
 						<li><a>Settings</a></li>
-						<li><a>Logout</a></li>
+						@LogoutForm()
 					</ul>
 				</div>
 			} else {
-				<a class="btn btn-primary">Login</a>
-				<a class="btn btn-secondary">Register</a>
+				<div class="space-x-3">
+					<a href="/login" class="btn btn-primary">Login</a>
+					<a href="/signup" class="btn btn-secondary">Sign Up</a>
+				</div>
 			}
 		</div>
 	</div>
+}
+
+templ LogoutForm() {
+	<form method="POST" action="/logout">
+		<li><button class="btn btn-sm btn-accent">Logout</button></li>
+	</form>
 }

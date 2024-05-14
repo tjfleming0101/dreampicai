@@ -26,10 +26,16 @@ func main() {
 
 	router.Handle("/*", http.StripPrefix("/", http.FileServer(http.FS(FS))))
 	router.Get("/", handler.Make(handler.HandleHomeIndex))
+	// Login
 	router.Get("/login", handler.Make(handler.HandleLoginIndex))
 	router.Post("/login", handler.Make(handler.HandleLoginCreate))
+	// SignUp
 	router.Get("/signup", handler.Make(handler.HandleSignupIndex))
 	router.Post("/signup", handler.Make(handler.HandleSignupCreate))
+	// Callback
+	router.Get("/auth/callback", handler.Make(handler.HandleAuthCallback))
+	// Logout
+	router.Post("/logout", handler.Make(handler.HandleLogoutCreate))
 
 	port := os.Getenv("PORT")
 	slog.Info("application running", "port", port)
