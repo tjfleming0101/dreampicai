@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
 	"github.com/tjfleming0101/dreampicai/handler"
+	"github.com/tjfleming0101/dreampicai/pkg/sb"
 )
 
 //go:embed static
@@ -24,7 +25,11 @@ func main() {
 	router.Use(handler.WithUser)
 
 	router.Handle("/*", http.StripPrefix("/", http.FileServer(http.FS(FS))))
-	router.Get("/", handler.MakeHandler(handler.HandleHomeIndex))
+	router.Get("/", handler.Make(handler.HandleHomeIndex))
+	router.Get("/login", handler.Make(handler.HandleLoginIndex))
+	router.Post("/login", handler.Make(handler.HandleLoginCreate))
+	router.Get("/signup", handler.Make(handler.HandleSignupIndex))
+	router.Post("/signup", handler.Make(handler.HandleSignupCreate))
 
 	port := os.Getenv("PORT")
 	slog.Info("application running", "port", port)
@@ -32,5 +37,9 @@ func main() {
 }
 
 func initEverything() error {
-	return godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		return err
+	}
+	
+	return sb.Init()
 }

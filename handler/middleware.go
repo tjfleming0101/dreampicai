@@ -1,9 +1,11 @@
 package handler
 
 import (
-	"fmt"
+	"context"
 	"net/http"
 	"strings"
+
+	"github.com/tjfleming0101/dreampicai/types"
 )
 
 // find the user, see if the user is logged in or not
@@ -13,8 +15,10 @@ func WithUser(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 			return
 		}
-		fmt.Println("from the with user middleware")
-		next.ServeHTTP(w, r)
+		user := types.AuthenticatedUser{}
+		ctx := context.WithValue(r.Context(), types.UserContextKey, user)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 	return http.HandlerFunc(fn)
 }
+

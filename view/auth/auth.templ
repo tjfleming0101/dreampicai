@@ -1,0 +1,125 @@
+package auth
+
+import "github.com/tjfleming0101/dreampicai/view/layout"
+import "github.com/nedpals/supabase-go"
+
+templ Signup() {
+	@layout.App(false) {
+		<div class="flex justify-center mt-[calc(100vh-100vh+8rem)]">
+			<div class="max-w-md w-full bg-base-300 py-12 px-8 rounded-xl">
+				<h1 class="text-center text-xl font-black text-primary">Singup to dreampicai</h1>
+				<div class="mt-10">
+					@SignupForm(SignupParams{}, SignupErrors{})
+				</div>
+			</div>
+		</div>
+	}
+}
+
+templ SingupSuccess(email string) {
+	<div>A confirmation email has been sent to: <span class="font-semibold text-success">{ email }</span></div>
+}
+
+type SignupParams struct {
+	Email           string
+	Password        string
+	ConfirmPassword string
+}
+
+type SignupErrors struct {
+	Email           string
+	Password        string
+	ConfirmPassword string
+}
+
+templ SignupForm(params SignupParams, errors SignupErrors) {
+	<form hx-post="/signup" hx-swap="outerHTML" class="space-y-4">
+		// Email
+		<label class="form-control w-full">
+			<div class="label">
+				<span class="label-text">Email Address</span>
+			</div>
+			<input type="email" value={ params.Email } name="email" required autocomplete="off" placeholder="Type here" class="input input-bordered w-full"/>
+			if len(errors.Email) > 0 {
+				<div class="label">
+					<span class="label-text-alt text-error">{ errors.Email }</span>
+				</div>
+			}
+		</label>
+		// Password
+		<label class="form-control w-full">
+			<div class="label">
+				<span class="label-text">Password</span>
+			</div>
+			<input type="password" name="password" required autocomplete="off" class="input input-bordered w-full"/>
+			if len(errors.Password) > 0 {
+				<div class="label">
+					<span class="label-text-alt text-error">{ errors.Password }</span>
+				</div>
+			}
+		</label>
+		// Confirm Password
+		<label class="form-control w-full">
+			<div class="label">
+				<span class="label-text">Confirm Password</span>
+			</div>
+			<input type="password" name="confirmPassword" required autocomplete="off" class="input input-bordered w-full"/>
+			if len(errors.ConfirmPassword) > 0 {
+				<div class="label">
+					<span class="label-text-alt text-error">{ errors.ConfirmPassword }</span>
+				</div>
+			}
+		</label>
+		<button type="submit" class="btn btn-secondary w-full">Login</button>
+	</form>
+}
+
+templ Login() {
+	@layout.App(false) {
+		<div class="flex justify-center mt-[calc(100vh-100vh+8rem)]">
+			<div class="max-w-md w-full bg-base-300 py-12 px-8 rounded-xl">
+				<h1 class="text-center text-xl font-black text-primary">Login to dreampicai</h1>
+				<div class="mt-10">
+					@LoginForm(supabase.UserCredentials{}, LoginErrors{})
+				</div>
+			</div>
+		</div>
+	}
+}
+
+type LoginErrors struct {
+	Email              string
+	Password           string
+	InvalidCredentials string
+}
+
+templ LoginForm(creds supabase.UserCredentials, errors LoginErrors) {
+	<form hx-post="/login" hx-swap="outerHTML" class="space-y-4">
+		<label class="form-control w-full">
+			<div class="label">
+				<span class="label-text">Email Address</span>
+			</div>
+			<input type="email" value={ creds.Email } name="email" required autocomplete="off" placeholder="Type here" class="input input-bordered w-full"/>
+			if len(errors.Email) > 0 {
+				<div class="label">
+					<span class="label-text-alt text-error">{ errors.Email }</span>
+				</div>
+			}
+		</label>
+		<label class="form-control w-full">
+			<div class="label">
+				<span class="label-text">Password</span>
+			</div>
+			<input type="password" name="password" required autocomplete="off" placeholder="Type here" class="input input-bordered w-full"/>
+			if len(errors.Password) > 0 {
+				<div class="label">
+					<span class="label-text-alt text-error">{ errors.Password }</span>
+				</div>
+			}
+		</label>
+		if len(errors.InvalidCredentials) > 0 {
+			<div class="text-sm text-error">{ errors.InvalidCredentials }</div>
+		}
+		<button type="submit" class="btn btn-secondary w-full">Login<i class="fa-solid fa-arrow-right"></i></button>
+	</form>
+}
