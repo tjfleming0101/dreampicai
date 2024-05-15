@@ -121,6 +121,8 @@ templ LoginForm(creds supabase.UserCredentials, errors LoginErrors) {
 			<div class="text-sm text-error">{ errors.InvalidCredentials }</div>
 		}
 		<button type="submit" class="btn btn-secondary w-full">Login<i class="fa-solid fa-arrow-right"></i></button>
+		<div class="divider">OR</div>
+		<a href="/login/provider/google" type="submit" class="btn btn-outline w-full">Login with Google<i class="fa-brands fa-google"></i></a>
 	</form>
 }
 

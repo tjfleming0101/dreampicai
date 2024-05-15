@@ -9,6 +9,21 @@ import (
 	"github.com/tjfleming0101/dreampicai/types"
 )
 
+func WithAuth(next http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		if strings.Contains(r.URL.Path, "/static") {
+			next.ServeHTTP(w, r)
+			return
+		}
+		user := getAuthenticatedUser(r)
+		if !user.LoggedIn {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+		}
+		next.ServeHTTP(w, r)
+	}
+	return http.HandlerFunc(fn)
+}
+
 // find the user, see if the user is logged in or not
 func WithUser(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {

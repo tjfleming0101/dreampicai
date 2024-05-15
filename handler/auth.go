@@ -68,6 +68,18 @@ func HandleLoginCreate(w http.ResponseWriter, r *http.Request) error {
 	return hxRedirect(w, r, "/")
 }
 
+func HandleLoginWithGoogle(w http.ResponseWriter, r *http.Request) error {
+	resp, err := sb.Client.Auth.SignInWithProvider(supabase.ProviderSignInOptions{
+		Provider: "google",
+		RedirectTo: "http://localhost:3000/auth/callback",
+	})
+	if err != nil {
+		return err
+	}
+	http.Redirect(w, r, resp.URL, http.StatusSeeOther)
+	return nil
+}
+
 func HandleLogoutCreate(w http.ResponseWriter, r *http.Request) error {
 	cookie := http.Cookie{
 		Value: "",
