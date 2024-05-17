@@ -26,7 +26,8 @@ func main() {
 	router.Use(handler.WithUser)
 
 	router.Handle("/*", http.StripPrefix("/", http.FileServer(http.FS(FS))))
-
+	// home page
+	router.Get("/", handler.Make(handler.HandleHomeIndex))
 	// login
 	router.Get("/login", handler.Make(handler.HandleLoginIndex))
 	router.Get("/login/provider/google", handler.Make(handler.HandleLoginWithGoogle))
@@ -38,17 +39,25 @@ func main() {
 	router.Get("/auth/callback", handler.Make(handler.HandleAuthCallback))
 	// logout
 	router.Post("/logout", handler.Make(handler.HandleLogoutCreate))
-	// account setup
-	router.Get("/account/setup", handler.Make(handler.HandleAccountSetupIndex))
-	router.Post("/account/setup", handler.Make(handler.HandleAccountSetupCreate))
 
+	// This is to make sure users are authenticated and then checks if they have setup an account before accessing the Settings page
 	router.Group(func(auth chi.Router) {
-		// make sure user is has an account
-		auth.Use(handler.WithAccountSetup)
-		// home page
-		auth.Get("/", handler.Make(handler.HandleHomeIndex))
+		// make sure user is an account setup
+		auth.Use(handler.WithAuth, handler.WithAccountSetup)
 		// settings
 		auth.Get("/settings", handler.Make(handler.HandleSettingsIndex))
+		auth.Put("/settings/account/profile", handler.Make(handler.HandleSettingsUsernameUpdate))
+
+	})
+
+	// This is the route for making sure users are authenticated but has no account setup
+	router.Group(func(account chi.Router) {
+		// make sure user has an account
+		account.Use(handler.WithAuth)
+		// account setup
+		account.Get("/account/setup", handler.Make(handler.HandleAccountSetupIndex))
+		account.Post("/account/setup", handler.Make(handler.HandleAccountSetupCreate))
+
 	})
 
 	port := os.Getenv("PORT")

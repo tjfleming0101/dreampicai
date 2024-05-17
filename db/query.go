@@ -7,6 +7,11 @@ import (
 	"github.com/tjfleming0101/dreampicai/types"
 )
 
+func UpdateAccount(account *types.Account) error {
+	_, err := Bun.NewUpdate().Model(account).WherePK().Exec(context.Background())
+	return err
+}
+
 func GetAccountbyUserID(userID uuid.UUID) (types.Account, error) {
 	var account types.Account
 	err := Bun.NewSelect().Model(&account).Where("user_id = ?", userID).Scan(context.Background())
