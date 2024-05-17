@@ -5,6 +5,8 @@ import "github.com/tjfleming0101/dreampicai/types"
 
 templ Index(user types.AuthenticatedUser) {
 	@layout.App(true) {
-		<div class="">Hello { user.Email }</div>
+		<div class="max-w-2xl w-full mx-auto mt-8">
+			Account
+		</div>
 	}
 }

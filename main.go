@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
+	"github.com/tjfleming0101/dreampicai/db"
 	"github.com/tjfleming0101/dreampicai/handler"
 	"github.com/tjfleming0101/dreampicai/pkg/sb"
 )
@@ -25,7 +26,7 @@ func main() {
 	router.Use(handler.WithUser)
 
 	router.Handle("/*", http.StripPrefix("/", http.FileServer(http.FS(FS))))
-	router.Get("/", handler.Make(handler.HandleHomeIndex))
+
 	// login
 	router.Get("/login", handler.Make(handler.HandleLoginIndex))
 	router.Get("/login/provider/google", handler.Make(handler.HandleLoginWithGoogle))
@@ -37,15 +38,18 @@ func main() {
 	router.Get("/auth/callback", handler.Make(handler.HandleAuthCallback))
 	// logout
 	router.Post("/logout", handler.Make(handler.HandleLogoutCreate))
+	// account setup
+	router.Get("/account/setup", handler.Make(handler.HandleAccountSetupIndex))
+	router.Post("/account/setup", handler.Make(handler.HandleAccountSetupCreate))
 
 	router.Group(func(auth chi.Router) {
-		// make sure user is authenticated
-		auth.Use(handler.WithAuth)
+		// make sure user is has an account
+		auth.Use(handler.WithAccountSetup)
+		// home page
+		auth.Get("/", handler.Make(handler.HandleHomeIndex))
 		// settings
 		auth.Get("/settings", handler.Make(handler.HandleSettingsIndex))
 	})
-
-	
 
 	port := os.Getenv("PORT")
 	slog.Info("application running", "port", port)
@@ -56,6 +60,8 @@ func initEverything() error {
 	if err := godotenv.Load(); err != nil {
 		return err
 	}
-	
+	if err := db.Init(); err != nil {
+		return err
+	}
 	return sb.Init()
 }
